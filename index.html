@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management System</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-gradient: radial-gradient(circle at top left, #1a103c, #070b19 75%);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.07);
+            --glass-border-focus: rgba(255, 255, 255, 0.2);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-gradient: linear-gradient(135deg, #a78bfa, #3b82f6);
+            --accent-color: #a78bfa;
+            --success-color: #34d399;
+            --danger-color: #f87171;
+            --warning-color: #fbbf24;
+            --shadow-primary: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.01);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Glassmorphic Container */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: var(--shadow-primary);
+        }
+
+        /* Layout Structure */
+        #sidebar {
+            width: 280px;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            border-right: 1px solid var(--glass-border);
+            z-index: 10;
+        }
+
+        #main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        /* Branding */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-left: 10px;
+        }
+        .brand i {
+            font-size: 28px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .brand h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            list-style: none;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        .nav-item i {
+            font-size: 18px;
+            width: 24px;
+        }
+        .nav-item:hover, .nav-item.active {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .nav-item.active i {
+            color: var(--accent-color);
+        }
+
+        /* Header / Stats Banner */
+        .header-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 30px;
+        }
+        .header-title h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .header-title p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        .stat-card {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition);
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--glass-border-focus);
+        }
+        .stat-info h3 {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-info p {
+            font-size: 32px;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            margin-top: 8px;
+        }
+        .stat-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            color: var(--accent-color);
+        }
+
+        /* Interactive Tables & Cards Grid */
+        .view-panel {
+            display: none;
+            flex-direction: column;
+            gap: 24px;
+            animation: fadeIn 0.4s ease;
+        }
+        .view-panel.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Search & Actions Bar */
+        .actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .search-container {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+        }
+        .search-container i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+        .search-input {
+            width: 100%;
+            padding: 14px 16px 14px 46px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            transition: var(--transition);
+        }
+        .search-input:focus {
+            border-color: var(--glass-border-focus);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Custom Button Component */
+        .btn {
+            padding: 14px 24px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            outline: none;
+        }
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: #070b19;
+            box-shadow: 0 4px 15px rgba(167, 139, 250, 0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(167, 139, 250, 0.4);
+            filter: brightness(1.1);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--glass-border-focus);
+        }
+        .btn-danger {
+            background: rgba(248, 113, 113, 0.15);
+            color: var(--danger-color);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+        }
+        .btn-danger:hover {
+            background: rgba(248, 113, 113, 0.25);
+            transform: translateY(-2px);
+        }
+        .btn-sm {
+            padding: 8px 14px;
+            font-size: 12px;
+            border-radius: 8px;
+        }
+
+        /* Employee Grid & Cards */
+        .employees-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        .employee-card {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+            transition: var(--transition);
+        }
+        .employee-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--glass-border-focus);
+        }
+        .emp-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .emp-badge.active {
+            background: rgba(52, 211, 153, 0.12);
+            color: var(--success-color);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+        }
+        .emp-badge.inactive {
+            background: rgba(248, 113, 113, 0.12);
+            color: var(--danger-color);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+        }
+        .emp-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #070b19;
+            margin-bottom: 8px;
+        }
+        .emp-details h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .emp-details .designation {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+        .emp-info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 12px;
+            font-size: 13px;
+        }
+        .emp-info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+        }
+        .emp-info-item i {
+            width: 16px;
+            color: var(--accent-color);
+        }
+        .emp-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        /* Glassmorphic Data Table styling */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+        .data-table th, .data-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .data-table th {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        .data-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        /* Badge Utilities */
+        .badge {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+        }
+        .badge-pending {
+            background: rgba(251, 191, 36, 0.12);
+            color: var(--warning-color);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+        }
+        .badge-approved {
+            background: rgba(52, 211, 153, 0.12);
+            color: var(--success-color);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+        }
+        .badge-rejected {
+            background: rgba(248, 113, 113, 0.12);
+            color: var(--danger-color);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+        }
+
+        /* Modal Dialog Component */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(7, 11, 25, 0.6);
+            backdrop-filter: blur(12px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal.open {
+            display: flex;
+            opacity: 1;
+        }
+        .modal-container {
+            width: 100%;
+            max-width: 550px;
+            padding: 30px;
+            border-radius: 16px;
+            animation: modalScale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes modalScale {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .modal-header h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
+            font-weight: 600;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+        
+        /* Form Inputs */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .form-group-full {
+            grid-column: 1 / -1;
+        }
+        .form-group label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .form-control {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            transition: var(--transition);
+            width: 100%;
+        }
+        .form-control:focus {
+            border-color: var(--glass-border-focus);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        select.form-control option {
+            background: #0f172a;
+            color: var(--text-primary);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 1000;
+        }
+        .toast {
+            padding: 16px 24px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 280px;
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .toast.show {
+            transform: translateX(0);
+        }
+        .toast-success { border-left: 4px solid var(--success-color); }
+        .toast-success i { color: var(--success-color); }
+        .toast-error { border-left: 4px solid var(--danger-color); }
+        .toast-error i { color: var(--danger-color); }
+
+        /* Quick Action Shortcut Cards */
+        .action-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .action-card {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .action-card:hover {
+            border-color: var(--glass-border-focus);
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .action-card i {
+            font-size: 24px;
+            color: var(--accent-color);
+        }
+        .action-card h4 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .action-card p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* Attendance Table Customization */
+        .attendance-toggle-group {
+            display: flex;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 2px;
+            width: fit-content;
+        }
+        .attendance-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .attendance-btn.active[data-status="Present"] {
+            background: rgba(52, 211, 153, 0.15);
+            color: var(--success-color);
+        }
+        .attendance-btn.active[data-status="Absent"] {
+            background: rgba(248, 113, 113, 0.15);
+            color: var(--danger-color);
+        }
+        .attendance-btn.active[data-status="Leave"] {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--warning-color);
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside id="sidebar" class="glass-panel">
+        <div class="brand">
+            <i class="fa-solid fa-users-gear"></i>
+            <h1>EMS Portal</h1>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item active" data-view="dashboard">
+                <i class="fa-solid fa-chart-pie"></i> Dashboard
+            </li>
+            <li class="nav-item" data-view="employees">
+                <i class="fa-solid fa-address-book"></i> Employees
+            </li>
+            <li class="nav-item" data-view="departments">
+                <i class="fa-solid fa-sitemap"></i> Departments
+            </li>
+            <li class="nav-item" data-view="attendance">
+                <i class="fa-solid fa-calendar-check"></i> Attendance
+            </li>
+            <li class="nav-item" data-view="leaves">
+                <i class="fa-solid fa-envelope-open-text"></i> Leave Requests
+            </li>
+        </ul>
+    </aside>
+
+    <!-- MAIN INTERACTIVE SECTION -->
+    <main id="main-content">
+        
+        <!-- HEADER TOP BANNER -->
+        <header class="header-banner glass-panel">
+            <div class="header-title">
+                <h2 id="header-text">Overview</h2>
+                <p>MongoDB + Frappe Employee Management Portal</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <span class="badge badge-approved"><i class="fa-solid fa-database" style="margin-right: 6px;"></i> MongoDB Live</span>
+                <span id="date-badge" class="badge" style="background: rgba(255,255,255,0.05); color: var(--text-primary);">Aug 10, 2026</span>
+            </div>
+        </header>
+
+        <!-- DASHBOARD VIEW PANEL -->
+        <section id="view-dashboard" class="view-panel active">
+            <div class="stats-grid">
+                <div class="stat-card glass-panel">
+                    <div class="stat-info">
+                        <h3>Total Employees</h3>
+                        <p id="stat-total-employees">0</p>
+                    </div>
+                    <div class="stat-icon"><i class="fa-solid fa-user-tie"></i></div>
+                </div>
+                <div class="stat-card glass-panel">
+                    <div class="stat-info">
+                        <h3>Departments</h3>
+                        <p id="stat-total-departments">0</p>
+                    </div>
+                    <div class="stat-icon"><i class="fa-solid fa-building"></i></div>
+                </div>
+                <div class="stat-card glass-panel">
+                    <div class="stat-info">
+                        <h3>Present Today</h3>
+                        <p id="stat-attendance-today">0</p>
+                    </div>
+                    <div class="stat-icon"><i class="fa-solid fa-clock"></i></div>
+                </div>
+                <div class="stat-card glass-panel">
+                    <div class="stat-info">
+                        <h3>Pending Leaves</h3>
+                        <p id="stat-pending-leaves">0</p>
+                    </div>
+                    <div class="stat-icon"><i class="fa-solid fa-calendar-minus"></i></div>
+                </div>
+            </div>
+
+            <div class="header-title" style="margin-top: 10px;">
+                <h2>Administrative Tasks</h2>
+            </div>
+            <div class="action-cards">
+                <div class="action-card glass-panel" onclick="openModal('employeeModal')">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <h4>Register Employee</h4>
+                    <p>Onboard and register new employee details in the MongoDB records.</p>
+                </div>
+                <div class="action-card glass-panel" onclick="openModal('departmentModal')">
+                    <i class="fa-solid fa-folder-plus"></i>
+                    <h4>New Department</h4>
+                    <p>Establish a new corporate department or cost-center division.</p>
+                </div>
+                <div class="action-card glass-panel" onclick="switchView('attendance')">
+                    <i class="fa-solid fa-clipboard-user"></i>
+                    <h4>Log Attendance</h4>
+                    <p>Quickly mark today's presence, absences, and leave logs for all employees.</p>
+                </div>
+                <div class="action-card glass-panel" onclick="switchView('leaves')">
+                    <i class="fa-solid fa-file-invoice"></i>
+                    <h4>Manage Leaves</h4>
+                    <p>Review, approve, or reject pending leave requests submitted by staff members.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- EMPLOYEES VIEW PANEL -->
+        <section id="view-employees" class="view-panel">
+            <div class="actions-bar">
+                <div class="search-container">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" class="search-input" id="search-employees" placeholder="Search employees by name, email, or designation..." oninput="filterEmployees()">
+                </div>
+                <button class="btn btn-primary" onclick="openAddEmployeeModal()">
+                    <i class="fa-solid fa-plus"></i> Onboard Employee
+                </button>
+            </div>
+            <div class="employees-grid" id="employees-container">
+                <!-- Cards Loaded Dynamically -->
+            </div>
+        </section>
+
+        <!-- DEPARTMENTS VIEW PANEL -->
+        <section id="view-departments" class="view-panel">
+            <div class="actions-bar">
+                <div class="search-container">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" class="search-input" id="search-departments" placeholder="Search departments..." oninput="filterDepartments()">
+                </div>
+                <button class="btn btn-primary" onclick="openModal('departmentModal')">
+                    <i class="fa-solid fa-plus"></i> Add Department
+                </button>
+            </div>
+            <div class="table-container glass-panel">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Dept ID</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th style="width: 120px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="departments-table-body">
+                        <!-- Loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ATTENDANCE VIEW PANEL -->
+        <section id="view-attendance" class="view-panel">
+            <div class="actions-bar">
+                <div class="form-group" style="flex-direction: row; align-items: center; gap: 12px; margin-bottom: 0;">
+                    <label for="attendance-date" style="white-space: nowrap; font-size: 14px;">Select Date:</label>
+                    <input type="date" class="form-control" id="attendance-date" style="max-width: 200px;" onchange="loadAttendanceForDate()">
+                </div>
+                <button class="btn btn-primary" id="btn-save-attendance" onclick="submitAttendance()">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Attendance Changes
+                </button>
+            </div>
+            <div class="table-container glass-panel">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Full Name</th>
+                            <th>Department</th>
+                            <th>Designation</th>
+                            <th style="width: 260px;">Attendance Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendance-table-body">
+                        <!-- Loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- LEAVES VIEW PANEL -->
+        <section id="view-leaves" class="view-panel">
+            <div class="actions-bar">
+                <h3 style="font-family: 'Outfit', sans-serif; font-size: 18px;">All Leave Applications</h3>
+                <button class="btn btn-primary" onclick="openApplyLeaveModal()">
+                    <i class="fa-solid fa-plus"></i> Apply Leave
+                </button>
+            </div>
+            <div class="table-container glass-panel">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Leave ID</th>
+                            <th>Employee ID</th>
+                            <th>Type</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th style="width: 200px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaves-table-body">
+                        <!-- Loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- EMPLOYEE MODAL (ADD & EDIT) -->
+    <div class="modal" id="employeeModal">
+        <div class="modal-container glass-panel">
+            <div class="modal-header">
+                <h3 id="employee-modal-title">Onboard New Employee</h3>
+                <button class="modal-close" onclick="closeModal('employeeModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="employeeForm" onsubmit="saveEmployee(event)">
+                <input type="hidden" id="emp-edit-mode" value="false">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="emp-id">Employee ID</label>
+                        <input type="text" class="form-control" id="emp-id" required placeholder="e.g. EMP101">
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-status">Status</label>
+                        <select class="form-control" id="emp-status">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-firstname">First Name</label>
+                        <input type="text" class="form-control" id="emp-firstname" required placeholder="e.g. John">
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-lastname">Last Name</label>
+                        <input type="text" class="form-control" id="emp-lastname" required placeholder="e.g. Doe">
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-email">Email Address</label>
+                        <input type="email" class="form-control" id="emp-email" required placeholder="e.g. john@company.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-phone">Phone Number</label>
+                        <input type="tel" class="form-control" id="emp-phone" required placeholder="e.g. +123456789">
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-dept">Department</label>
+                        <select class="form-control" id="emp-dept" required>
+                            <!-- Dynamically loaded -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-designation">Designation</label>
+                        <input type="text" class="form-control" id="emp-designation" required placeholder="e.g. Senior Developer">
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-datejoining">Date of Joining</label>
+                        <input type="date" class="form-control" id="emp-datejoining" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-salary">Annual Salary ($)</label>
+                        <input type="number" class="form-control" id="emp-salary" required placeholder="e.g. 85000">
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('employeeModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Database Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- DEPARTMENT MODAL -->
+    <div class="modal" id="departmentModal">
+        <div class="modal-container glass-panel">
+            <div class="modal-header">
+                <h3>Create New Department</h3>
+                <button class="modal-close" onclick="closeModal('departmentModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="departmentForm" onsubmit="saveDepartment(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="dept-id">Department ID</label>
+                        <input type="text" class="form-control" id="dept-id" required placeholder="e.g. DEPT-HR">
+                    </div>
+                    <div class="form-group">
+                        <label for="dept-name">Department Name</label>
+                        <input type="text" class="form-control" id="dept-name" required placeholder="e.g. Human Resources">
+                    </div>
+                    <div class="form-group form-group-full">
+                        <label for="dept-desc">Description</label>
+                        <textarea class="form-control" id="dept-desc" rows="3" placeholder="Describe the main responsibilities of the department..."></textarea>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('departmentModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Department</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- LEAVE MODAL -->
+    <div class="modal" id="leaveModal">
+        <div class="modal-container glass-panel">
+            <div class="modal-header">
+                <h3>Submit Leave Request</h3>
+                <button class="modal-close" onclick="closeModal('leaveModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="leaveForm" onsubmit="saveLeave(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="leave-emp">Employee</label>
+                        <select class="form-control" id="leave-emp" required>
+                            <!-- Dynamically loaded -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="leave-type">Leave Type</label>
+                        <select class="form-control" id="leave-type">
+                            <option value="Sick Leave">Sick Leave</option>
+                            <option value="Casual Leave">Casual Leave</option>
+                            <option value="Annual Leave">Annual Leave</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="leave-start">Start Date</label>
+                        <input type="date" class="form-control" id="leave-start" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="leave-end">End Date</label>
+                        <input type="date" class="form-control" id="leave-end" required>
+                    </div>
+                    <div class="form-group form-group-full">
+                        <label for="leave-reason">Reason</label>
+                        <textarea class="form-control" id="leave-reason" rows="3" required placeholder="Explain reason for leave..."></textarea>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('leaveModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST ALERTS CONTAINER -->
+    <div class="toast-container" id="toast-box"></div>
+
+    <!-- LOGIC APPLICATION -->
+    <script>
+        // Global variables holding states
+        let allEmployees = [];
+        let allDepartments = [];
+        let allLeaves = [];
+        let currentAttendanceRecords = {}; // emp_id -> status
+
+        // Init App
+        window.addEventListener('DOMContentLoaded', () => {
+            // Set current date on badge
+            const now = new Date();
+            document.getElementById('date-badge').innerText = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            document.getElementById('attendance-date').value = now.toISOString().split('T')[0];
+            
+            // Switch views trigger
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const targetView = item.getAttribute('data-view');
+                    switchView(targetView);
+                });
+            });
+
+            // Initial fetch of data
+            refreshAllData();
+        });
+
+        // Refresh all application datasets from server
+        async function refreshAllData() {
+            await fetchDepartments();
+            await fetchEmployees();
+            await fetchLeaves();
+            updateDashboardStats();
+            loadAttendanceForDate();
+        }
+
+        // Navigation
+        function switchView(viewName) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                if (item.getAttribute('data-view') === viewName) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            document.querySelectorAll('.view-panel').forEach(panel => {
+                if (panel.id === `view-${viewName}`) {
+                    panel.classList.add('active');
+                } else {
+                    panel.classList.remove('active');
+                }
+            });
+
+            // Update title text
+            const titleMap = {
+                'dashboard': 'Overview Dashboard',
+                'employees': 'Employee Directory',
+                'departments': 'Department Management',
+                'attendance': 'Daily Attendance Logger',
+                'leaves': 'Leave Applications & Reviews'
+            };
+            document.getElementById('header-text').innerText = titleMap[viewName] || 'Overview';
+        }
+
+        // Modals Management
+        function openModal(id) {
+            document.getElementById(id).classList.add('open');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('open');
+        }
+
+        // Custom Dynamic Toasts
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-box');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type} glass-panel`;
+            
+            const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation';
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${message}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 50);
+
+            // Clear toast
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400);
+            }, 3500);
+        }
+
+        /* ------------------ DATABASE RETRIEVAL API CALLS ------------------ */
+
+        async function fetchEmployees() {
+            try {
+                const response = await fetch('/api/method/employee_manager.api.get_employees');
+                const res = await response.json();
+                allEmployees = res.message || [];
+                renderEmployees(allEmployees);
+                populateEmployeeDropdowns();
+            } catch (err) {
+                console.error("Error fetching employees", err);
+                showToast("Failed to connect and load employees from server.", "error");
+            }
+        }
+
+        async function fetchDepartments() {
+            try {
+                const response = await fetch('/api/method/employee_manager.api.get_departments');
+                const res = await response.json();
+                allDepartments = res.message || [];
+                renderDepartmentsTable(allDepartments);
+                populateDepartmentDropdowns();
+            } catch (err) {
+                console.error("Error fetching departments", err);
+                showToast("Failed to fetch department records.", "error");
+            }
+        }
+
+        async function fetchLeaves() {
+            try {
+                const response = await fetch('/api/method/employee_manager.api.get_leaves');
+                const res = await response.json();
+                allLeaves = res.message || [];
+                renderLeavesTable(allLeaves);
+            } catch (err) {
+                console.error("Error fetching leaves", err);
+                showToast("Failed to load leaves records.", "error");
+            }
+        }
+
+        /* ------------------ DOM RENDERING & LOGIC ------------------ */
+
+        // Render employee grid cards
+        function renderEmployees(emps) {
+            const container = document.getElementById('employees-container');
+            container.innerHTML = '';
+
+            if (emps.length === 0) {
+                container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">
+                    <i class="fa-solid fa-folder-open" style="font-size: 40px; margin-bottom: 12px; display:block;"></i>
+                    No employees found matching filter.
+                </div>`;
+                return;
+            }
+
+            emps.forEach(emp => {
+                const deptName = getDepartmentName(emp.department_id);
+                const initials = `${emp.first_name[0] || ''}${emp.last_name[0] || ''}`.toUpperCase();
+                
+                const card = document.createElement('div');
+                card.className = 'employee-card glass-panel';
+                card.innerHTML = `
+                    <span class="emp-badge ${emp.status.toLowerCase()}">${emp.status}</span>
+                    <div class="emp-avatar">${initials}</div>
+                    <div class="emp-details">
+                        <h4>${emp.first_name} ${emp.last_name}</h4>
+                        <div class="designation">${emp.designation}</div>
+                    </div>
+                    <div class="emp-info-list">
+                        <div class="emp-info-item"><i class="fa-solid fa-fingerprint"></i> ID: ${emp.employee_id}</div>
+                        <div class="emp-info-item"><i class="fa-solid fa-envelope"></i> ${emp.email}</div>
+                        <div class="emp-info-item"><i class="fa-solid fa-phone"></i> ${emp.phone}</div>
+                        <div class="emp-info-item"><i class="fa-solid fa-building"></i> Dept: ${deptName}</div>
+                        <div class="emp-info-item"><i class="fa-solid fa-dollar-sign"></i> Salary: $${parseFloat(emp.salary).toLocaleString()}</div>
+                    </div>
+                    <div class="emp-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="openEditEmployeeModal('${emp.employee_id}')"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEmployee('${emp.employee_id}')"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Render departments table
+        function renderDepartmentsTable(depts) {
+            const tbody = document.getElementById('departments-table-body');
+            tbody.innerHTML = '';
+
+            if (depts.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-secondary);">No departments created yet.</td></tr>`;
+                return;
+            }
+
+            depts.forEach(dept => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight: 600;">${dept.department_id}</td>
+                    <td>${dept.name}</td>
+                    <td style="color: var(--text-secondary);">${dept.description || 'No description provided.'}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="deleteDepartment('${dept.department_id}')"><i class="fa-solid fa-trash-can"></i> Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Render Leaves applications
+        function renderLeavesTable(leaves) {
+            const tbody = document.getElementById('leaves-table-body');
+            tbody.innerHTML = '';
+
+            if (leaves.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-secondary);">No leave records found.</td></tr>`;
+                return;
+            }
+
+            leaves.forEach(leave => {
+                const empName = getEmployeeFullName(leave.employee_id);
+                const badgeClass = leave.status === 'Approved' ? 'badge-approved' : (leave.status === 'Rejected' ? 'badge-rejected' : 'badge-pending');
+                
+                let actionsHTML = '';
+                if (leave.status === 'Pending') {
+                    actionsHTML = `
+                        <button class="btn btn-primary btn-sm" onclick="updateLeaveStatus('${leave.leave_id}', 'Approved')" style="background: var(--success-color); color: #070b19; font-weight:700;"><i class="fa-solid fa-check"></i></button>
+                        <button class="btn btn-danger btn-sm" onclick="updateLeaveStatus('${leave.leave_id}', 'Rejected')"><i class="fa-solid fa-xmark"></i></button>
+                    `;
+                } else {
+                    actionsHTML = `<span style="font-size:12px; color:var(--text-secondary); font-style:italic;">Decided</span>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-family:monospace; font-weight:600;">#${leave.leave_id}</td>
+                    <td>${empName} (ID: ${leave.employee_id})</td>
+                    <td>${leave.leave_type}</td>
+                    <td>${leave.start_date}</td>
+                    <td>${leave.end_date}</td>
+                    <td style="font-size:13px; color: var(--text-secondary); max-width: 200px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${leave.reason}</td>
+                    <td><span class="badge ${badgeClass}">${leave.status}</span></td>
+                    <td><div style="display:flex; gap:8px;">${actionsHTML}</div></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Populate dynamic dropdown inputs
+        function populateDepartmentDropdowns() {
+            const select = document.getElementById('emp-dept');
+            select.innerHTML = '<option value="" disabled selected>Select Department</option>';
+            allDepartments.forEach(dept => {
+                const opt = document.createElement('option');
+                opt.value = dept.department_id;
+                opt.innerText = dept.name;
+                select.appendChild(opt);
+            });
+        }
+
+        function populateEmployeeDropdowns() {
+            const select = document.getElementById('leave-emp');
+            select.innerHTML = '<option value="" disabled selected>Select Employee</option>';
+            allEmployees.forEach(emp => {
+                const opt = document.createElement('option');
+                opt.value = emp.employee_id;
+                opt.innerText = `${emp.first_name} ${emp.last_name} (ID: ${emp.employee_id})`;
+                select.appendChild(opt);
+            });
+        }
+
+        // Search Filters
+        function filterEmployees() {
+            const val = document.getElementById('search-employees').value.toLowerCase();
+            const filtered = allEmployees.filter(emp => {
+                const fullName = `${emp.first_name} ${emp.last_name}`.toLowerCase();
+                const email = emp.email.toLowerCase();
+                const des = emp.designation.toLowerCase();
+                return fullName.includes(val) || email.includes(val) || des.includes(val);
+            });
+            renderEmployees(filtered);
+        }
+
+        function filterDepartments() {
+            const val = document.getElementById('search-departments').value.toLowerCase();
+            const filtered = allDepartments.filter(dept => {
+                return dept.name.toLowerCase().includes(val) || dept.department_id.toLowerCase().includes(val);
+            });
+            renderDepartmentsTable(filtered);
+        }
+
+        // Utility Helpers
+        function getDepartmentName(deptId) {
+            const dept = allDepartments.find(d => d.department_id === deptId);
+            return dept ? dept.name : deptId;
+        }
+
+        function getEmployeeFullName(empId) {
+            const emp = allEmployees.find(e => e.employee_id === empId);
+            return emp ? `${emp.first_name} ${emp.last_name}` : empId;
+        }
+
+        // Update dashboard widgets based on local copies
+        function updateDashboardStats() {
+            document.getElementById('stat-total-employees').innerText = allEmployees.length;
+            document.getElementById('stat-total-departments').innerText = allDepartments.length;
+            
+            const pendingLeavesCount = allLeaves.filter(l => l.status === 'Pending').length;
+            document.getElementById('stat-pending-leaves').innerText = pendingLeavesCount;
+        }
+
+        /* ------------------ DATABASE MUTATION API CALLS (FORM SAVING) ------------------ */
+
+        async function saveEmployee(event) {
+            event.preventDefault();
+            
+            const isEdit = document.getElementById('emp-edit-mode').value === 'true';
+            
+            const formData = new URLSearchParams();
+            formData.append('employee_id', document.getElementById('emp-id').value);
+            formData.append('first_name', document.getElementById('emp-firstname').value);
+            formData.append('last_name', document.getElementById('emp-lastname').value);
+            formData.append('email', document.getElementById('emp-email').value);
+            formData.append('phone', document.getElementById('emp-phone').value);
+            formData.append('department_id', document.getElementById('emp-dept').value);
+            formData.append('designation', document.getElementById('emp-designation').value);
+            formData.append('date_of_joining', document.getElementById('emp-datejoining').value);
+            formData.append('salary', document.getElementById('emp-salary').value);
+            formData.append('status', document.getElementById('emp-status').value);
+
+            const method = isEdit ? 'update_employee' : 'add_employee';
+
+            try {
+                const response = await fetch(`/api/method/employee_manager.api.${method}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData.toString()
+                });
+                
+                const res = await response.json();
+                if (res.exc) {
+                    showToast(JSON.parse(res.exc)[0] || "API execution error occurred.", "error");
+                } else {
+                    showToast(isEdit ? "Employee updated successfully!" : "Onboarded employee into MongoDB.");
+                    closeModal('employeeModal');
+                    refreshAllData();
+                }
+            } catch (err) {
+                console.error("Save employee error", err);
+                showToast("Failed to save employee profile.", "error");
+            }
+        }
+
+        function openAddEmployeeModal() {
+            document.getElementById('employee-modal-title').innerText = "Onboard New Employee";
+            document.getElementById('emp-edit-mode').value = "false";
+            document.getElementById('emp-id').disabled = false;
+            document.getElementById('employeeForm').reset();
+            openModal('employeeModal');
+        }
+
+        function openEditEmployeeModal(empId) {
+            const emp = allEmployees.find(e => e.employee_id === empId);
+            if (!emp) return;
+
+            document.getElementById('employee-modal-title').innerText = "Edit Employee Details";
+            document.getElementById('emp-edit-mode').value = "true";
+            document.getElementById('emp-id').value = emp.employee_id;
+            document.getElementById('emp-id').disabled = true; // Emp ID is unique key, cannot edit
+            
+            document.getElementById('emp-firstname').value = emp.first_name;
+            document.getElementById('emp-lastname').value = emp.last_name;
+            document.getElementById('emp-email').value = emp.email;
+            document.getElementById('emp-phone').value = emp.phone;
+            document.getElementById('emp-dept').value = emp.department_id;
+            document.getElementById('emp-designation').value = emp.designation;
+            document.getElementById('emp-datejoining').value = emp.date_of_joining;
+            document.getElementById('emp-salary').value = emp.salary;
+            document.getElementById('emp-status').value = emp.status;
+
+            openModal('employeeModal');
+        }
+
+        async function deleteEmployee(empId) {
+            if (!confirm(`Are you sure you want to permanently delete employee ID ${empId}?`)) return;
+
+            try {
+                const response = await fetch('/api/method/employee_manager.api.delete_employee', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `employee_id=${empId}`
+                });
+                
+                const res = await response.json();
+                if (res.exc) {
+                    showToast("Failed to delete records.", "error");
+                } else {
+                    showToast("Employee and metrics deleted from MongoDB.");
+                    refreshAllData();
+                }
+            } catch (err) {
+                console.error("Delete employee error", err);
+                showToast("Failed to execute delete request.", "error");
+            }
+        }
+
+        async function saveDepartment(event) {
+            event.preventDefault();
+            
+            const formData = new URLSearchParams();
+            formData.append('department_id', document.getElementById('dept-id').value);
+            formData.append('name', document.getElementById('dept-name').value);
+            formData.append('description', document.getElementById('dept-desc').value);
+
+            try {
+                const response = await fetch('/api/method/employee_manager.api.add_department', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData.toString()
+                });
+                
+                const res = await response.json();
+                if (res.exc) {
+                    showToast("Department ID already exists.", "error");
+                } else {
+                    showToast("Department registered successfully!");
+                    closeModal('departmentModal');
+                    document.getElementById('departmentForm').reset();
+                    refreshAllData();
+                }
+            } catch (err) {
+                console.error("Add dept error", err);
+                showToast("Failed to create department.", "error");
+            }
+        }
+
+        async function deleteDepartment(deptId) {
+            if (!confirm(`Are you sure you want to delete department ${deptId}?`)) return;
+
+            try {
+                const response = await fetch('/api/method/employee_manager.api.delete_department', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `department_id=${deptId}`
+                });
+                
+                const res = await response.json();
+                showToast("Department profile removed.");
+                refreshAllData();
+            } catch (err) {
+                console.error("Delete department error", err);
+                showToast("Failed to delete department.", "error");
+            }
+        }
+
+        /* ------------------ ATTENDANCE MODULE LOGIC ------------------ */
+
+        async function loadAttendanceForDate() {
+            const date = document.getElementById('attendance-date').value;
+            if (!date) return;
+
+            try {
+                const response = await fetch(`/api/method/employee_manager.api.get_attendance?date=${date}`);
+                const res = await response.json();
+                const records = res.message || [];
+
+                currentAttendanceRecords = {};
+                records.forEach(rec => {
+                    currentAttendanceRecords[rec.employee_id] = rec.status;
+                });
+
+                renderAttendanceTable();
+                updateAttendanceStatsWidget();
+            } catch (err) {
+                console.error("Error loading attendance", err);
+            }
+        }
+
+        function renderAttendanceTable() {
+            const tbody = document.getElementById('attendance-table-body');
+            tbody.innerHTML = '';
+
+            if (allEmployees.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-secondary);">No employees registered yet. Onboard employees to log attendance.</td></tr>`;
+                return;
+            }
+
+            allEmployees.forEach(emp => {
+                const deptName = getDepartmentName(emp.department_id);
+                // Default status to Present if not logged
+                const currentStatus = currentAttendanceRecords[emp.employee_id] || 'Present';
+                currentAttendanceRecords[emp.employee_id] = currentStatus; // make sure it is populated
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${emp.employee_id}</td>
+                    <td style="font-weight: 600;">${emp.first_name} ${emp.last_name}</td>
+                    <td>${deptName}</td>
+                    <td>${emp.designation}</td>
+                    <td>
+                        <div class="attendance-toggle-group">
+                            <button class="attendance-btn ${currentStatus === 'Present' ? 'active' : ''}" data-empid="${emp.employee_id}" data-status="Present" onclick="toggleAttendance('${emp.employee_id}', 'Present')">Present</button>
+                            <button class="attendance-btn ${currentStatus === 'Absent' ? 'active' : ''}" data-empid="${emp.employee_id}" data-status="Absent" onclick="toggleAttendance('${emp.employee_id}', 'Absent')">Absent</button>
+                            <button class="attendance-btn ${currentStatus === 'Leave' ? 'active' : ''}" data-empid="${emp.employee_id}" data-status="Leave" onclick="toggleAttendance('${emp.employee_id}', 'Leave')">Leave</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleAttendance(empId, status) {
+            currentAttendanceRecords[empId] = status;
+            
+            // UI Toggle updating classlist
+            document.querySelectorAll(`.attendance-btn[data-empid="${empId}"]`).forEach(btn => {
+                if (btn.getAttribute('data-status') === status) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        async function submitAttendance() {
+            const date = document.getElementById('attendance-date').value;
+            const recordsStr = JSON.stringify(currentAttendanceRecords);
+
+            const formData = new URLSearchParams();
+            formData.append('date', date);
+            formData.append('records', recordsStr);
+
+            try {
+                const response = await fetch('/api/method/employee_manager.api.mark_attendance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData.toString()
+                });
+                
+                const res = await response.json();
+                if (res.exc) {
+                    showToast("Failed to save log.", "error");
+                } else {
+                    showToast(`Saved attendance log for ${date}.`);
+                    updateAttendanceStatsWidget();
+                }
+            } catch (err) {
+                console.error("Submit attendance error", err);
+                showToast("Failed to communicate logs to database.", "error");
+            }
+        }
+
+        function updateAttendanceStatsWidget() {
+            // Count present employees for selected date
+            let presentCount = 0;
+            Object.values(currentAttendanceRecords).forEach(status => {
+                if (status === 'Present') presentCount++;
+            });
+            document.getElementById('stat-attendance-today').innerText = presentCount;
+        }
+
+        /* ------------------ LEAVES MODULE LOGIC ------------------ */
+
+        function openApplyLeaveModal() {
+            if (allEmployees.length === 0) {
+                showToast("No registered employees to request leave.", "warning");
+                return;
+            }
+            document.getElementById('leaveForm').reset();
+            openModal('leaveModal');
+        }
+
+        async function saveLeave(event) {
+            event.preventDefault();
+
+            const formData = new URLSearchParams();
+            formData.append('employee_id', document.getElementById('leave-emp').value);
+            formData.append('leave_type', document.getElementById('leave-type').value);
+            formData.append('start_date', document.getElementById('leave-start').value);
+            formData.append('end_date', document.getElementById('leave-end').value);
+            formData.append('reason', document.getElementById('leave-reason').value);
+
+            try {
+                const response = await fetch('/api/method/employee_manager.api.apply_leave', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData.toString()
+                });
+                
+                const res = await response.json();
+                showToast("Leave request filed to MongoDB.");
+                closeModal('leaveModal');
+                refreshAllData();
+            } catch (err) {
+                console.error("Apply leave error", err);
+                showToast("Failed to request leave.", "error");
+            }
+        }
+
+        async function updateLeaveStatus(leaveId, status) {
+            const formData = new URLSearchParams();
+            formData.append('leave_id', leaveId);
+            formData.append('status', status);
+
+            try {
+                const response = await fetch('/api/method/employee_manager.api.update_leave_status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData.toString()
+                });
+                
+                const res = await response.json();
+                showToast(`Leave application #${leaveId} has been ${status.toLowerCase()}.`);
+                refreshAllData();
+            } catch (err) {
+                console.error("Update leave error", err);
+                showToast("Failed to review leave application.", "error");
+            }
+        }
+
+    </script>
+</body>
+</html>
